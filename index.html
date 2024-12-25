@@ -2,95 +2,33 @@
 <html>
 <head>
     <title>LayerTwo Labs</title>
-    <style>
-        body {
-            background-color: black;
-            color: white;
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-
-        h1 {
-            color: white;
-            margin-bottom: 40px;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        #progress {
-            width: 300px;
-            margin: 10px 0;
-        }
-
-        .error {
-            color: red;
-        }
-
-        .download-section {
-            margin-bottom: 30px;
-        }
-
-        .title {
-            color: white;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .description {
-            color: #888;
-            margin-bottom: 15px;
-        }
-
-        .download-button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-
-        .start-button {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-
-        .download-button:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-    </style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>LayerTwo Labs</h1>
+    <img src="/drivechain.png" alt="Drivechain Logo" width="30%" class="header-image">
 
-    <div class="download-section">
-        <div class="title">Bitcoin 300/301 + Enforcer</div>
-        <div class="description">BIP 300 & 301 enabled Bitcoin</div>
-        <button id="downloadButton" class="download-button">Download L1</button>
-        <button id="startButton" class="start-button hidden">Start BitWindow</button>
+    <div class="container">
+        <div class="download-section">
+            <button id="downloadButton" class="download-button">Download</button>
+            <button id="startButton" class="start-button hidden">Start</button>
+            <div class="title">Bitcoin 300/301 + Enforcer</div>
+            <div class="description">BIP 300 & 301 enabled Bitcoin</div>
+        </div>
+        <img src="/settings.png" alt="Settings" class="settings-image">
     </div>
 
-    <div class="download-section">
-        <div class="title">Thunder</div>
-        <div class="description">Fast and efficient large block sidechain</div>
-        <button id="downloadThunderButton" class="download-button">Download Thunder</button>
-        <button id="startThunderButton" class="start-button hidden">Start Thunder</button>
+    <div class="container">
+        <div class="download-section">
+            <button id="downloadThunderButton" class="download-button">Download</button>
+            <button id="startThunderButton" class="start-button hidden">Start</button>
+            <div class="title">Thunder</div>
+            <div class="description">Fast and efficient large block sidechain</div>
+        </div>
+        <img src="/settings.png" alt="Settings" class="settings-image">
     </div>
 
     <progress id="progress" class="hidden" value="0" max="100"></progress>
     <div id="status"></div>
-
- 
-
 
 
 
