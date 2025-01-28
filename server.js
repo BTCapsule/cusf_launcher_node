@@ -705,7 +705,49 @@ const l1Dir = dirs.l1;  // or dirs.thunder, dirs.bitnames etc.
 
 
 
+// Add this new endpoint for creating wallet
+app.get('/create-wallet', async (req, res) => {
+    try {
+        const dirs = getDataDir();
+        const l1Dir = dirs.l1;
+        
+        // Determine grpcurl path based on OS
+        let grpcurlPath = '';
+        switch (os.platform()) {
+            case 'win32':
+                grpcurlPath = path.join(l1Dir, 'grpcurl.exe');
+                break;
+            default: // linux and darwin
+                grpcurlPath = path.join(l1Dir, 'grpcurl');
+                break;
+        }
 
+        // Make grpcurl executable on Unix systems
+        if (os.platform() !== 'win32') {
+            await execAsync(`chmod +x "${grpcurlPath}"`);
+        }
+
+        // Execute the grpcurl command
+        const { stdout, stderr } = await execAsync(
+            `"${grpcurlPath}" -plaintext localhost:50051 cusf.mainchain.v1.WalletService/CreateWallet`
+        );
+
+        console.log('Wallet creation output:', stdout);
+        if (stderr) console.error('Wallet creation stderr:', stderr);
+
+        res.json({
+            success: true,
+            message: 'Wallet created successfully'
+        });
+
+    } catch (err) {
+        console.error('Error creating wallet:', err);
+        res.status(500).json({
+            success: false,
+            error: err.message
+        });
+    }
+});
 
 
 
