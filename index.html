@@ -7,31 +7,69 @@
 <body>
     <img src="/drivechain.png" alt="Drivechain Logo" width="30%" class="header-image">
 
-    <div class="container">
-        <div class="download-section">
-            <button id="downloadButton" class="download-button">Download</button>
-            <button id="startButton" class="start-button hidden">Start</button>
-            <div class="title">Bitcoin 300/301 + Enforcer</div>
-            <div class="description">BIP 300 & 301 enabled Bitcoin</div>
+  <div class="container">
+    <div class="download-section">
+        <div class="button-text-group">
+            <div class="button-group">
+                <button id="downloadButton" class="download-button">Download</button>
+                <button id="startButton" class="start-button hidden">Start</button>
+            </div>
+            <div class="text-content">
+                <div class="title">Bitcoin 300/301 + Enforcer</div>
+                <div class="description">BIP 300 & 301 enabled Bitcoin</div>
+            </div>
         </div>
-        <img src="/settings.png" alt="Settings" class="settings-image">
     </div>
+    <img src="/settings.png" alt="Settings" class="settings-image">
+</div>
 
-    <div class="container">
-        <div class="download-section">
-            <button id="downloadThunderButton" class="download-button">Download</button>
-            <button id="startThunderButton" class="start-button hidden">Start</button>
-            <div class="title">Thunder</div>
-            <div class="description">Fast and efficient large block sidechain</div>
+<div class="container">
+    <div class="download-section">
+        <div class="button-text-group">
+            <div class="button-group">
+                <button id="downloadThunderButton" class="download-button">Download</button>
+                <button id="startThunderButton" class="start-button hidden">Start</button>
+            </div>
+            <div class="text-content">
+                <div class="title">Thunder</div>
+                <div class="description">Fast and efficient large block sidechain</div>
+            </div>
         </div>
-        <img src="/settings.png" alt="Settings" class="settings-image">
     </div>
+    <img src="/settings.png" alt="Settings" class="settings-image">
+</div>
+
+<div class="container">
+    <div class="download-section">
+        <div class="button-text-group">
+            <div class="button-group">
+                <button id="downloadBitNamesButton" class="download-button">Download</button>
+                <button id="startBitNamesButton" class="start-button hidden">Start</button>
+            </div>
+            <div class="text-content">
+                <div class="title">BitNames</div>
+                <div class="description">Decentralized DNS sidechain</div>
+            </div>
+        </div>
+    </div>
+    <img src="/settings.png" alt="Settings" class="settings-image">
+</div>
 
     <progress id="progress" class="hidden" value="0" max="100"></progress>
     <div id="status"></div>
 
 
 
+        <div id="settingsModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <h2>Reset Everything?</h2>
+        <p>This will delete all Drivechain related folders and data.</p>
+        <div class="modal-buttons">
+            <button id="confirmReset">Yes</button>
+            <button id="cancelReset">No</button>
+        </div>
+    </div>
+</div>
 
 
 
@@ -58,68 +96,95 @@
             }
         }
 
-
-
-
-    async function startBitWindow() {
-        try {
-            status.textContent = 'Starting BitWindow...';
-            const response = await fetch('/start-bitwindow');
-            const data = await response.json();
-            
-            if (data.success) {
-                console.log('BitWindow started successfully');
-                status.textContent = 'BitWindow is running';
-            } else {
-                console.error('Failed to start BitWindow:', data.error);
-                status.className = 'error';
-                status.textContent = 'Failed to start BitWindow: ' + data.error;
-            }
-        } catch (err) {
-            console.error('Error starting BitWindow:', err);
-            status.className = 'error';
-            status.textContent = 'Error starting BitWindow: ' + err.message;
+// Add L1 download button listener
+downloadButton.addEventListener('click', async () => {
+    downloadButton.disabled = true;
+    progress.classList.remove('hidden');
+    status.className = '';
+    status.textContent = 'Downloading L1...';
+    
+    try {
+        // Download L1 components
+        const response = await fetch('/download-l1');
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Download failed');
         }
+        
+        status.textContent = 'Extracting L1...';
+        
+        // Extract L1 components
+        const extractResponse = await fetch('/extract-l1');
+        if (!extractResponse.ok) {
+            const error = await extractResponse.json();
+            throw new Error(error.error || 'Extraction failed');
+        }
+
+        const result = await extractResponse.json();
+        downloadButton.style.display = 'none';
+        startButton.style.display = 'block';
+        status.textContent = 'Ready to start BitWindow';
+        console.log('L1 files extracted to:', result.path);
+        
+    } catch (error) {
+        status.className = 'error';
+        status.textContent = 'Error: ' + error.message;
+        console.error('Error:', error);
+        downloadButton.disabled = false;
     }
+    
+    progress.classList.add('hidden');
+});
 
-    downloadButton.addEventListener('click', async () => {
-        downloadButton.disabled = true;
-        progress.classList.remove('hidden');
-        status.className = '';
-        status.textContent = 'Downloading...';
-        
-        try {
-            // Download
-            const response = await fetch('/download-l1');
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error || 'Download failed');
-            }
-            
-            status.textContent = 'Extracting...';
-            
-            // Extract
-            const extractResponse = await fetch('/extract-l1');
-            if (!extractResponse.ok) {
-                const error = await extractResponse.json();
-                throw new Error(error.error || 'Extraction failed');
-            }
-
-            const result = await extractResponse.json();
-            downloadButton.style.display = 'none';
-            startButton.style.display = 'block';
-            status.textContent = 'Ready to start BitWindow';
-            console.log('Files extracted to:', result.path);
-            
-        } catch (error) {
-            status.className = 'error';
-            status.textContent = 'Error: ' + error.message;
-            console.error('Error:', error);
-            downloadButton.disabled = false;
+async function startBitWindow() {
+    try {
+        // Start Bitcoin first
+        status.textContent = 'Starting Bitcoin...';
+        let response = await fetch('/start-bitcoin');
+        let data = await response.json();
+        if (!data.success) {
+            throw new Error('Failed to start Bitcoin');
         }
         
-        progress.classList.add('hidden');
-    });
+        // Wait a moment for Bitcoin to initialize
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Then start Enforcer
+        status.textContent = 'Starting Enforcer...';
+        response = await fetch('/start-enforcer');
+        data = await response.json();
+        if (!data.success) {
+            throw new Error('Failed to start Enforcer');
+        }
+        
+        // Wait a moment for Enforcer to initialize
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // Finally start BitWindow
+        status.textContent = 'Starting BitWindow...';
+        response = await fetch('/start-bitwindow');
+        data = await response.json();
+        
+        if (data.success) {
+            console.log('BitWindow started successfully');
+            status.textContent = 'BitWindow is running';
+            setTimeout(() => {
+                status.textContent = '';
+                status.classList.remove('visible');
+            }, 2000);
+        } else {
+            throw new Error(data.error || 'Failed to start BitWindow');
+        }
+    } catch (err) {
+        console.error('Error starting BitWindow:', err);
+        status.className = 'error visible';
+        status.textContent = 'Error: ' + err.message;
+        setTimeout(() => {
+            status.textContent = '';
+            status.classList.remove('visible');
+        }, 3000);
+    }
+}
 
     startButton.addEventListener('click', startBitWindow);
        
@@ -206,14 +271,188 @@
 
         startThunderButton.addEventListener('click', startThunder);
 
-        // Add Thunder check to your initial checks
-        checkBitWindow();
-        checkThunder();
+const downloadBitNamesButton = document.getElementById('downloadBitNamesButton');
+const startBitNamesButton = document.getElementById('startBitNamesButton');
+
+// BitNames check function
+async function checkBitNames() {
+    try {
+        const response = await fetch('/check-bitnames');
+        const data = await response.json();
+        
+        if (data.exists) {
+            downloadBitNamesButton.style.display = 'none';
+            startBitNamesButton.style.display = 'block';
+            status.textContent = 'Ready to start BitNames';
+        }
+    } catch (err) {
+        console.error('Error checking BitNames:', err);
+    }
+}
+
+// BitNames start function
+async function startBitNames() {
+    try {
+        status.textContent = 'Starting BitNames...';
+        const response = await fetch('/start-bitnames');
+        const data = await response.json();
+        
+        if (data.success) {
+            console.log('BitNames started successfully');
+            status.textContent = 'BitNames is running';
+        } else {
+            console.error('Failed to start BitNames:', data.error);
+            status.className = 'error';
+            status.textContent = 'Failed to start BitNames: ' + data.error;
+        }
+    } catch (err) {
+        console.error('Error starting BitNames:', err);
+        status.className = 'error';
+        status.textContent = 'Error starting BitNames: ' + err.message;
+    }
+}
+
+// Add BitNames download button listener
+downloadBitNamesButton.addEventListener('click', async () => {
+    downloadBitNamesButton.disabled = true;
+    progress.classList.remove('hidden');
+    status.className = '';
+    status.textContent = 'Downloading BitNames...';
+    
+    try {
+        const response = await fetch('/download-bitnames');
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Download failed');
+        }
+        
+        status.textContent = 'Extracting BitNames...';
+        
+        const extractResponse = await fetch('/extract-bitnames');
+        if (!extractResponse.ok) {
+            const error = await extractResponse.json();
+            throw new Error(error.error || 'Extraction failed');
+        }
+
+        const result = await extractResponse.json();
+        downloadBitNamesButton.style.display = 'none';
+        startBitNamesButton.style.display = 'block';
+        status.textContent = 'Ready to start BitNames';
+        console.log('BitNames files extracted to:', result.path);
+        
+    } catch (error) {
+        status.className = 'error';
+        status.textContent = 'Error: ' + error.message;
+        console.error('Error:', error);
+        downloadBitNamesButton.disabled = false;
+    }
+    
+    progress.classList.add('hidden');
+});
+
+startBitNamesButton.addEventListener('click', startBitNames);
+
+// Add BitNames check to your initial checks
+checkBitWindow();
+checkThunder();
+checkBitNames(); // Add this line
+
+// Add click handler for L1 settings icon
+document.querySelector('.container:first-of-type .settings-image').addEventListener('click', async () => {
+    if (confirm('Are you sure you want to delete the L1 folder?')) {
+        try {
+            const response = await fetch('/delete-l1', { method: 'DELETE' });
+            const data = await response.json();
+            
+            if (data.success) {
+                // Reset UI to show download button
+                downloadButton.style.display = 'block';
+                downloadButton.disabled = false;
+                startButton.style.display = 'none';
+                status.textContent = 'L1 folder deleted successfully';
+                status.className = '';
+            } else {
+                throw new Error(data.error || 'Failed to delete L1 folder');
+            }
+        } catch (error) {
+            console.error('Error deleting L1:', error);
+            status.textContent = 'Error deleting L1: ' + error.message;
+            status.className = 'error';
+        }
+    }
+});        
+        
+// Get all settings images
+document.querySelectorAll('.settings-image').forEach(img => {
+    img.style.cursor = 'pointer';
+    img.addEventListener('click', function() {
+        // Get the container that holds this settings image
+        const container = img.closest('.container');
+        // Get the title from this container
+        const title = container.querySelector('.title').textContent;
+        
+        // Determine which endpoint to call based on the title
+        let endpoint = '';
+        if (title === 'Thunder') {
+            endpoint = '/delete-thunder';
+        } else if (title === 'BitNames') {
+            endpoint = '/delete-bitnames';
+        } else {
+            // For Bitcoin/Enforcer, show the regular reset modal
+            document.getElementById('settingsModal').style.display = 'block';
+            return;
+        }
+
+        // For Thunder and BitNames, make the delete request
+        if (endpoint) {
+            if (confirm(`Are you sure you want to delete ${title}?`)) {
+                fetch(endpoint, { method: 'DELETE' })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            alert(`${title} has been deleted successfully.`);
+                            window.location.reload();
+                        } else {
+                            alert(`Failed to delete ${title}: ${result.error}`);
+                        }
+                    })
+                    .catch(error => {
+                        alert(`Error deleting ${title}: ${error.message}`);
+                    });
+            }
+        }
+    });
+});
+
+// Handle modal buttons
+document.getElementById('cancelReset').addEventListener('click', function() {
+    document.getElementById('settingsModal').style.display = 'none';
+});
+
+document.getElementById('confirmReset').addEventListener('click', async function() {
+    try {
+        const response = await fetch('/reset-folders', {
+            method: 'POST'
+        });
+        const result = await response.json();
+        if (result.success) {
+            alert('Reset successful. Please restart the application.');
+            window.location.reload();
+        } else {
+            alert('Reset failed: ' + result.error);
+        }
+    } catch (error) {
+        alert('Error during reset: ' + error.message);
+    }
+    document.getElementById('settingsModal').style.display = 'none';
+});
+        
+        
 </script>
         
         
         
-        
+
         
         
 </body>
