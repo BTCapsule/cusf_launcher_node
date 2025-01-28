@@ -140,18 +140,20 @@ downloadButton.addEventListener('click', async () => {
 // Modify the existing startBitWindow function
 async function startBitWindow() {
     try {
-        // Change button to running state immediately
-        startButton.textContent = 'Running';
-        startButton.classList.remove('start-button');
-        startButton.classList.add('running-button');
-        
-        // Add hover event listener immediately
-        startButton.addEventListener('mouseover', () => {
-            startButton.textContent = 'Stop';
+        // Remove old button and create new running button immediately
+        const newButton = document.createElement('button');
+        newButton.id = 'startButton';
+        newButton.className = 'running-button';
+        newButton.textContent = 'Running';
+        startButton.parentNode.replaceChild(newButton, startButton);
+
+        // Add hover listeners to new button
+        newButton.addEventListener('mouseover', () => {
+            newButton.textContent = 'Stop';
         });
         
-        startButton.addEventListener('mouseout', () => {
-            startButton.textContent = 'Running';
+        newButton.addEventListener('mouseout', () => {
+            newButton.textContent = 'Running';
         });
 
         // Start Bitcoin first
@@ -176,6 +178,17 @@ async function startBitWindow() {
         // Wait a moment for Enforcer to initialize
         await new Promise(resolve => setTimeout(resolve, 2000));
 
+        // Execute create-wallet command after Enforcer starts
+        status.textContent = 'Creating wallet...';
+        response = await fetch('/create-wallet');
+        data = await response.json();
+        if (!data.success) {
+            throw new Error('Failed to create wallet');
+        }
+
+        // Wait a moment after wallet creation
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
         // Finally start BitWindow
         status.textContent = 'Starting BitWindow...';
         response = await fetch('/start-bitwindow');
@@ -196,14 +209,21 @@ async function startBitWindow() {
         status.className = 'error visible';
         status.textContent = 'Error: ' + err.message;
         
-        // Reset button state on error
+        // Reset to green start button on error
+        const startButton = document.createElement('button');
+        startButton.id = 'startButton';
+        startButton.className = 'start-button';
         startButton.textContent = 'Start';
-        startButton.classList.remove('running-button');
-        startButton.classList.add('start-button');
         
-        // Remove hover listeners on error
-        startButton.removeEventListener('mouseover', () => {});
-        startButton.removeEventListener('mouseout', () => {});
+        // Replace the running button with the start button
+        document.querySelector('#startButton').parentNode.replaceChild(startButton, document.querySelector('#startButton'));
+        
+        // Add click listener to the new button
+        startButton.addEventListener('click', async function() {
+            if (!this.classList.contains('running-button')) {
+                startBitWindow();
+            }
+        });
     }
 }
 
