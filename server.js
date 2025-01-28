@@ -1188,6 +1188,44 @@ app.delete('/delete-bitnames', async (req, res) => {
     }
 });
 
+app.post('/stop-l1', async (req, res) => {
+    try {
+        // Stop BitWindow first
+        if (runningProcesses.bitwindow) {
+            runningProcesses.bitwindow.kill();
+        }
+        
+        // Stop Enforcer
+        if (runningProcesses.enforcer) {
+            runningProcesses.enforcer.kill();
+        }
+        
+        // Stop Bitcoin last (give it more time to shut down gracefully)
+        if (runningProcesses.bitcoin) {
+            runningProcesses.bitcoin.kill();
+            // Wait for Bitcoin to shut down
+            await new Promise(resolve => setTimeout(resolve, 5000));
+        }
+
+        // Clear the running processes
+        runningProcesses.bitwindow = null;
+        runningProcesses.enforcer = null;
+        runningProcesses.bitcoin = null;
+        
+        res.json({
+            success: true,
+            message: 'All L1 processes stopped'
+        });
+    } catch (err) {
+        console.error('Error stopping L1 processes:', err);
+        res.status(500).json({
+            success: false,
+            error: err.message
+        });
+    }
+});
+
+
 app.get('/stop-bitcoin', async (req, res) => {
     try {
         const http = require('http');
