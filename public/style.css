@@ -72,31 +72,49 @@ body {
             margin-bottom: 15px;
         }
 
-        .download-button {
-            background-color: #007bff;
-            font-size: 16px;
-            font-weight: bold;
-            width: 120px;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
+  .download-button {
+    background-color: #007bff; /* Blue */
+    font-size: 16px;
+    font-weight: bold;
+    width: 120px;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
 
-        .start-button {
-            background-color: #28a745;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            border: none;
-            width: 120px;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
+.start-button {
+    background-color: #28a745; /* Green */
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    width: 120px;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.running-button {
+    background-color: #ffa500; /* Orange */
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    width: 120px;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.running-button:hover {
+    background-color: #ff0000; /* Red */
+    content: "Stop";
+}
 
         .download-button:disabled {
             opacity: 0.7;
@@ -161,10 +179,6 @@ body {
     margin-top: 5px;
     color: #888;
 }
-        
-
-        
-        
         
 
         
