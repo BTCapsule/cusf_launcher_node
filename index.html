@@ -136,8 +136,24 @@ downloadButton.addEventListener('click', async () => {
     progress.classList.add('hidden');
 });
 
+
+// Modify the existing startBitWindow function
 async function startBitWindow() {
     try {
+        // Change button to running state immediately
+        startButton.textContent = 'Running';
+        startButton.classList.remove('start-button');
+        startButton.classList.add('running-button');
+        
+        // Add hover event listener immediately
+        startButton.addEventListener('mouseover', () => {
+            startButton.textContent = 'Stop';
+        });
+        
+        startButton.addEventListener('mouseout', () => {
+            startButton.textContent = 'Running';
+        });
+
         // Start Bitcoin first
         status.textContent = 'Starting Bitcoin...';
         let response = await fetch('/start-bitcoin');
@@ -165,29 +181,84 @@ async function startBitWindow() {
         response = await fetch('/start-bitwindow');
         data = await response.json();
         
-        if (data.success) {
-            console.log('BitWindow started successfully');
-            status.textContent = 'BitWindow is running';
-            setTimeout(() => {
-                status.textContent = '';
-                status.classList.remove('visible');
-            }, 2000);
-        } else {
+        if (!data.success) {
             throw new Error(data.error || 'Failed to start BitWindow');
         }
+
+        console.log('BitWindow started successfully');
+        status.textContent = 'BitWindow is running';
+        setTimeout(() => {
+            status.textContent = '';
+        }, 2000);
+
     } catch (err) {
         console.error('Error starting BitWindow:', err);
         status.className = 'error visible';
         status.textContent = 'Error: ' + err.message;
-        setTimeout(() => {
-            status.textContent = '';
-            status.classList.remove('visible');
-        }, 3000);
+        
+        // Reset button state on error
+        startButton.textContent = 'Start';
+        startButton.classList.remove('running-button');
+        startButton.classList.add('start-button');
+        
+        // Remove hover listeners on error
+        startButton.removeEventListener('mouseover', () => {});
+        startButton.removeEventListener('mouseout', () => {});
     }
 }
 
-    startButton.addEventListener('click', startBitWindow);
-       
+// Add click handler for stopping processes
+startButton.addEventListener('click', async function() {
+    if (this.classList.contains('running-button')) {
+        // Stop mode
+        try {
+            // Remove hover listeners immediately
+            const newButton = document.createElement('button');
+            newButton.id = 'startButton';
+            newButton.className = 'running-button'; // Keep it red
+            newButton.textContent = 'Stopping';
+            this.parentNode.replaceChild(newButton, this);
+
+            status.textContent = 'Stopping L1 processes...';
+            const response = await fetch('/stop-l1', { 
+                method: 'POST'
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                // Now create the final green Start button
+                const startButton = document.createElement('button');
+                startButton.id = 'startButton';
+                startButton.className = 'start-button';
+                startButton.textContent = 'Start';
+                
+                // Replace the stopping button with the start button
+                newButton.parentNode.replaceChild(startButton, newButton);
+                
+                // Add click listener to the new button
+                startButton.addEventListener('click', async function() {
+                    if (!this.classList.contains('running-button')) {
+                        startBitWindow();
+                    }
+                });
+                
+                status.textContent = 'L1 processes stopped';
+                setTimeout(() => {
+                    status.textContent = '';
+                }, 2000);
+            } else {
+                throw new Error(data.error || 'Failed to stop L1 processes');
+            }
+        } catch (error) {
+            console.error('Error stopping L1:', error);
+            status.className = 'error';
+            status.textContent = 'Error stopping L1: ' + error.message;
+        }
+    } else {
+        // Start mode
+        startBitWindow();
+    }
+});
        
        
        const downloadThunderButton = document.getElementById('downloadThunderButton');
