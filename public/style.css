@@ -1,9 +1,28 @@
-       body {
-            background-color: #151515;
-            color: white;
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    background-color: #151515;
+    color: white;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='rgb(25,25,25)' viewBox='0 0 100 169.5'%3E%3Cpolygon points='50,34.75 93.5,59.75 93.5,109.75 50,134.75 6.5,109.75 6.5,59.75'%3E%3C/polygon%3E%3Cpolygon points='0,-50 43.5,-25 43.5,25 0,50 -43.5,25 -43.5,-25'%3E%3C/polygon%3E%3Cpolygon points='100,-50 143.5,-25 143.5,25 100,50 56.5,25 56.5,-25'%3E%3C/polygon%3E%3Cpolygon points='0,119.5 43.5,144.5 43.5,194.5 0,219.5 -43.5,194.5 -43.5,144.5'%3E%3C/polygon%3E%3Cpolygon points='100,119.5 143.5,144.5 143.5,194.5 100,219.5 56.5,194.5 56.5,144.5'%3E%3C/polygon%3E%3C/svg%3E");
+    background-size: 32px;
+    background-position: center;
+}
+
+ 
+
+
+
+
+
+
+
+
+
 
         h1 {
             color: white;
@@ -14,10 +33,25 @@
             display: none;
         }
 
-        #progress {
-            width: 300px;
-            margin: 10px 0;
-        }
+#progress {
+    width: 300px;
+    margin: 20px auto;
+    display: none; /* Changed from block to none */
+}
+
+#status {
+    text-align: center;
+    margin: 10px auto;
+    min-height: 20px;
+    color: #888;
+    display: none; /* Add this line */
+}
+
+/* Add these new rules */
+#progress.visible,
+#status.visible {
+    display: block;
+}
 
         .error {
             color: red;
@@ -42,6 +76,7 @@
             background-color: #007bff;
             font-size: 16px;
             font-weight: bold;
+            width: 120px;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -53,7 +88,10 @@
         .start-button {
             background-color: #28a745;
             color: white;
+            font-size: 16px;
+            font-weight: bold;
             border: none;
+            width: 120px;
             padding: 10px 20px;
             cursor: pointer;
             border-radius: 5px;
@@ -68,6 +106,7 @@
         .header-image {
             display: block;
             margin: 0 auto;
+            margin-bottom: 50px;
             max-width: 100%;
             height: auto;
             padding: 20px 0;
@@ -93,6 +132,38 @@
     cursor: pointer;
     margin-top: 10px; /* This aligns it with the download button */
 }
+        
+        
+        
+.button-text-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 30px; /* This creates the 30px spacing between button and text */
+}
+
+.button-group {
+    flex-shrink: 0; /* Prevents the button from shrinking */
+}
+
+.text-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.title {
+    margin: 0;
+    color: white;
+    font-weight: bold;
+}
+
+.description {
+    margin-top: 5px;
+    color: #888;
+}
+        
+
+        
         
         
 
